@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+    <title>Popular Secrets</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'wall_css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome Ninja to  the popular 的秘密, I see you are {{ request.session.first_name }} {{ request.session.last_name }}</h1><br>
+            <img src={% static "ninjaClass.png" %}>
+            <form class="inline" action="/logout" method="">
+                {% csrf_token %}
+                    <input type='submit' value='Logout'>
+            </form>
+        </div>
+        <h2>These are the most popular messages!</h2>
+    </div>
+        {% for i in messages reversed %}
+        <div class="container">
+            <h2>{{ i.user.first_name }} {{ i.user.last_name }}</h2>
+            <h3>{{ i.created_at }}</h3>
+            <h3>{{ i.like_count }} likes</h3>
+            <p>{{ i.msg }}</p>
+            <form action="/{{i.id}}/like" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name = "user_id" value = "{{ request.session.user_id }}">
+                <input type="hidden" name = "id" value = "{{ i.id }}">
+                <input type="submit" value = "Like a secret">
+            </form>
+                {% for comment in comments %}
+                    {% if i.id == comment.msg_id %}
+                        <h4>{{ comment.user.first_name }} {{ comment.user.last_name }}</h4>
+                        <p>{{ comment.comnt }}</p>
+                        <p>{{ comment.created_at }}</p>
+                        <a href="/{{comment.id}}/del_comnt">Delete a comment</a>
+                    {% endif %}
+                {% endfor %}
+            <form action="/post_cmnt" method="POST">
+                {% csrf_token %}
+                <textarea name="cmnt" cols="100" rows="2"></textarea><br>
+                <input type="hidden" name="id" value="{{ i.id }}">
+                <input type="submit" value = "Comment a secret">
+            </form>
+        </div>
+       {% endfor %} 
+</body>
+</html>
